@@ -1,5 +1,8 @@
 Revision history for Perl extension File::SAUCE.
 
+0.21  Tue Dec 20 2005
+	- changed $fh->binmode to binmode $fh
+
 0.2   Thu Sep 29 2005
 	- Switched from IO::File to FileHandle
 	- use string multiplication where needed

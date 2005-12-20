@@ -161,7 +161,7 @@ use Time::Piece;
 
 use base qw( Class::Accessor );
 
-our $VERSION = '0.2';
+our $VERSION = '0.21';
 
 # some SAUCE constants
 use constant SAUCE_ID      => 'SAUCE';
@@ -651,7 +651,7 @@ sub _create_io_object {
 		croak( "No valid read type. Must be one of 'file', 'string' or 'handle'." );
 	}
 
-	$file->binmode;
+	binmode $file;
 	return $file;
 }
 
