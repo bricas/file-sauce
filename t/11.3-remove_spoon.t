@@ -4,10 +4,9 @@ use strict;
 use warnings;
 
 use File::Copy;
-use File::Slurp;
 
 BEGIN {
-	use_ok( 'File::SAUCE' );
+    use_ok( 'File::SAUCE' );
 }
 
 my $testfile = qw( t/data/remove.dat );
@@ -30,7 +29,7 @@ is( $sauce->has_sauce, 0, 'Has Sauce' );
 is( -s $testfile, $filesize, 'Filesize' );
 
 create_test_file( $file );
-	
+    
 # remove from handle
 open( FILE, "+<$testfile" );
 
@@ -46,9 +45,15 @@ is( -s $testfile, $filesize, 'Filesize' );
 close( FILE );
 
 create_test_file( $file );
-	
+    
 # remove from string
-my $string = read_file( $testfile );
+my $string = do {
+    open( my $data, $testfile );
+    local $/;
+    my $content = <$data>;
+    close( $data );
+    $content;
+};
 
 $sauce->read( string => $string );
 is( $sauce->has_sauce, 1, 'Has Sauce' );
@@ -63,8 +68,8 @@ is( length( $string ), $filesize, 'Filesize' );
 unlink( $testfile );
 
 sub create_test_file {
-	my $file = shift;
+    my $file = shift;
 
-	unlink( $testfile );
-	copy( $file, $testfile );
+    unlink( $testfile );
+    copy( $file, $testfile );
 }

@@ -4,11 +4,11 @@ use strict;
 use warnings;
 
 BEGIN {
-	eval "use IO::Capture::Stdout";
-	plan skip_all => "IO::Capture::Stdout required" if $@;
-	plan tests => 9;
+    eval "use IO::Capture::Stdout";
+    plan skip_all => "IO::Capture::Stdout required" if $@;
+    plan tests => 9;
 
-	use_ok( 'File::SAUCE' );
+    use_ok( 'File::SAUCE' );
 }
 
 eval 'use IO::Capture::Stdout';
@@ -91,18 +91,18 @@ EOF
 check_output( $filename, $output );
 
 sub check_output {
-	my( $filename, $output, $special ) = @_;
+    my( $filename, $output, $special ) = @_;
 
-	my $sauce = File::SAUCE->new( file => $filename );
-	isa_ok( $sauce, 'File::SAUCE', 'SAUCE record' );
+    my $sauce = File::SAUCE->new( file => $filename );
+    isa_ok( $sauce, 'File::SAUCE', 'SAUCE record' );
 
-	$sauce->$_( $special->{ $_ } ) for keys %$special;
+    $sauce->$_( $special->{ $_ } ) for keys %$special;
 
-	my $capture = IO::Capture::Stdout->new;
-	$capture->start;
-	$sauce->print;
-	$capture->stop;
-	my @lines = $capture->read;
+    my $capture = IO::Capture::Stdout->new;
+    $capture->start;
+    $sauce->print;
+    $capture->stop;
+    my @lines = $capture->read;
 
-	is( join( '', @lines ), $output, 'Print' );
+    is( join( '', @lines ), $output, 'Print' );
 }

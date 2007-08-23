@@ -4,10 +4,9 @@ use strict;
 use warnings;
 
 use File::Copy;
-use File::Slurp;
 
 BEGIN {
-	use_ok( 'File::SAUCE' );
+    use_ok( 'File::SAUCE' );
 }
 
 my $testfile = qw( t/data/remove.dat );
@@ -17,57 +16,63 @@ my $sauce    = File::SAUCE->new;
 isa_ok( $sauce, 'File::SAUCE' );
 
 for my $file ( @files ) {
-	create_test_file( $file );
+    create_test_file( $file );
 
-	my $filesize = -s $testfile;
+    my $filesize = -s $testfile;
 
-	# remove from file
-	$sauce->read( file => $testfile );
-	is( $sauce->has_sauce, 0, 'Has Sauce' );
+    # remove from file
+    $sauce->read( file => $testfile );
+    is( $sauce->has_sauce, 0, 'Has Sauce' );
 
-	$sauce->remove( file => $testfile );
-	$sauce->read( file => $testfile );
+    $sauce->remove( file => $testfile );
+    $sauce->read( file => $testfile );
 
-	is( $sauce->has_sauce, 0, 'Has Sauce' );
-	is( -s $testfile, $filesize, 'Filesize' );
+    is( $sauce->has_sauce, 0, 'Has Sauce' );
+    is( -s $testfile, $filesize, 'Filesize' );
 
-	create_test_file( $file );
-	
-	# remove from handle
-	open( FILE, "+<$testfile" );
+    create_test_file( $file );
+    
+    # remove from handle
+    open( FILE, "+<$testfile" );
 
-	$sauce->read( handle => \*FILE );
-	is( $sauce->has_sauce, 0, 'Has Sauce' );
+    $sauce->read( handle => \*FILE );
+    is( $sauce->has_sauce, 0, 'Has Sauce' );
 
-	$sauce->remove( handle => \*FILE );
-	$sauce->read( handle => \*FILE );
+    $sauce->remove( handle => \*FILE );
+    $sauce->read( handle => \*FILE );
 
-	is( $sauce->has_sauce, 0, 'Has Sauce' );
-	is( -s $testfile, $filesize, 'Filesize' );
+    is( $sauce->has_sauce, 0, 'Has Sauce' );
+    is( -s $testfile, $filesize, 'Filesize' );
 
-	close( FILE );
-	
-	create_test_file( $file );
-	
-	# remove from string
-	my $string = read_file( $testfile );
+    close( FILE );
+    
+    create_test_file( $file );
+    
+    # remove from string
+    my $string = do {
+        open( my $data, $testfile );
+        local $/;
+        my $content = <$data>;
+        close( $data );
+        $content;
+    };
 
-	$sauce->read( string => $string );
-	is( $sauce->has_sauce, 0, 'Has Sauce' );
+    $sauce->read( string => $string );
+    is( $sauce->has_sauce, 0, 'Has Sauce' );
 
-	$string = $sauce->remove( string => $string );
-	$sauce->read( string => $string );
+    $string = $sauce->remove( string => $string );
+    $sauce->read( string => $string );
 
-	is( $sauce->has_sauce, 0, 'Has Sauce' );
-	is( length( $string ), $filesize, 'Filesize' );
+    is( $sauce->has_sauce, 0, 'Has Sauce' );
+    is( length( $string ), $filesize, 'Filesize' );
 
-	# clean up
-	unlink( $testfile );
+    # clean up
+    unlink( $testfile );
 }
 
 sub create_test_file {
-	my $file = shift;
+    my $file = shift;
 
-	unlink( $testfile );
-	copy( $file, $testfile );
+    unlink( $testfile );
+    copy( $file, $testfile );
 }

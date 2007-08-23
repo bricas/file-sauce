@@ -5,7 +5,7 @@ use warnings;
 use Time::Piece;
 
 BEGIN {
-	use_ok( 'File::SAUCE' );
+    use_ok( 'File::SAUCE' );
 }
 
 my $date = localtime->ymd;

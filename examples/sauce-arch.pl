@@ -15,12 +15,12 @@ printf( $tmpl, 'FILE', 'AUTHOR', 'TITLE', 'GROUP' );
 printf( $tmpl, '-' x 12, '-' x 15, '-' x 35, '-' x 14 ); 
 
 for( $zip->members ) {
-	# skip directories
-	next if $_->isDirectory;
+    # skip directories
+    next if $_->isDirectory;
 
-	# get SAUCE data from file contents
-	$sauce->read( string => scalar $_->contents );
+    # get SAUCE data from file contents
+    $sauce->read( string => scalar $_->contents );
 
-	# print the result
-	printf( $tmpl, $_->fileName, $sauce->author, $sauce->title, $sauce->group );
+    # print the result
+    printf( $tmpl, $_->fileName, $sauce->author, $sauce->title, $sauce->group );
 }

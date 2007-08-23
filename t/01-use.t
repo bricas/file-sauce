@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 BEGIN {
-	use_ok( 'File::SAUCE' );
+    use_ok( 'File::SAUCE' );
 }
 
 my $sauce = File::SAUCE->new;
