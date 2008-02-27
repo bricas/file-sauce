@@ -1,5 +1,8 @@
 Revision history for Perl extension File::SAUCE.
 
+0.23  Wed Feb 27 2008
+    - Module::Install update
+
 0.22  Thu Aug 23 2007
     - switch to Module::Install
     - remove File::Slurp from test deps

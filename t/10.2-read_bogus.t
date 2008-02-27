@@ -39,5 +39,5 @@ for my $file ( @files ) {
 my $sauce = File::SAUCE->new;
 isa_ok( $sauce, 'File::SAUCE' );
 $sauce->read( file => 't/data/bogus_comnt.dat' );
-is( $sauce->has_sauce, 1, 'Has Sauce' );
+is( $sauce->has_sauce,            1, 'Has Sauce' );
 is( scalar @{ $sauce->comments }, 0, 'Comments' );

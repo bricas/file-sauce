@@ -152,7 +152,7 @@ use Time::Piece;
 
 use base qw( Class::Accessor );
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 # some SAUCE constants
 use constant SAUCE_ID      => 'SAUCE';
@@ -161,61 +161,67 @@ use constant SAUCE_FILLER  => ' ' x 22;
 use constant COMNT_ID      => 'COMNT';
 
 # vars for use with pack() and unpack()
-my $sauce_template  = 'A5 A2 A35 A20 A20 A8 V C C v v v v C C A22';
-my @sauce_fields    = qw( sauce_id version title author group date filesize datatype_id filetype_id tinfo1 tinfo2 tinfo3 tinfo4 comments flags_id filler );
-my $comnt_template  = 'A5 A64';
-my @comnt_fields    = qw( comment_id comments );
-my $date_format     = '%Y%m%d';
+my $sauce_template = 'A5 A2 A35 A20 A20 A8 V C C v v v v C C A22';
+my @sauce_fields
+    = qw( sauce_id version title author group date filesize datatype_id filetype_id tinfo1 tinfo2 tinfo3 tinfo4 comments flags_id filler );
+my $comnt_template = 'A5 A64';
+my @comnt_fields   = qw( comment_id comments );
+my $date_format    = '%Y%m%d';
 
 __PACKAGE__->mk_accessors( @sauce_fields, $comnt_fields[ 0 ], 'has_sauce' );
 
 # define datatypes and filetypes as per SAUCE specs
-my @datatypes = qw(None Character Graphics Vector Sound BinaryText XBin Archive Executable);
+my @datatypes
+    = qw(None Character Graphics Vector Sound BinaryText XBin Archive Executable);
 my $filetypes = {
-    None       => {
+    None => {
         filetypes => [ qw( Undefined ) ],
         flags     => { 0 => 'None' }
     },
-    Character  => {
-        filetypes => [ qw( ASCII ANSi ANSiMation RIP PCBoard Avatar HTML Source ) ],
-        flags     => { 0 => 'None', 1 => 'iCE Color' },
-        tinfo     => [
+    Character => {
+        filetypes =>
+            [ qw( ASCII ANSi ANSiMation RIP PCBoard Avatar HTML Source ) ],
+        flags => { 0 => 'None', 1 => 'iCE Color' },
+        tinfo => [
             ( { tinfo1 => 'Width', tinfo2 => 'Height' } ) x 3,
             { tinfo1 => 'Width', tinfo2 => 'Height', tinfo3 => 'Colors' },
             ( { tinfo1 => 'Width', tinfo2 => 'Height' } ) x 2
         ]
     },
-    Graphics   => {
-        filetypes => [ qw( GIF PCX LBM/IFF TGA FLI FLC BMP GL DL WPG PNG JPG MPG AVI ) ],
-        flags     => { 0 => 'None' },
-        tinfo     => [
-            ( { tinfo1 => 'Width', tinfo2 => 'Height', tinfo3 => 'Bits Per Pixel' } ) x 14
+    Graphics => {
+        filetypes => [
+            qw( GIF PCX LBM/IFF TGA FLI FLC BMP GL DL WPG PNG JPG MPG AVI )
+        ],
+        flags => { 0 => 'None' },
+        tinfo => [
+            (   {   tinfo1 => 'Width',
+                    tinfo2 => 'Height',
+                    tinfo3 => 'Bits Per Pixel'
+                }
+            ) x 14
         ]
     },
-    Vector     => {
+    Vector => {
         filetypes => [ qw( DXF DWG WPG 3DS ) ],
         flags     => { 0 => 'None' }
     },
-    Sound      => {
-        filetypes => [ qw( MOD 669 STM S3M MTM FAR ULT AMF DMF OKT ROL CMF MIDI SADT VOC WAV SMP8 SMP8S SMP16 SMP16S PATCH8 PATCH16 XM HSC IT ) ],
-        flags     => { 0 => 'None' },
-        tinfo     => [
-            ( { } ) x 16,
-            ( { tinfo1 => 'Sampling Rate' } ) x 4
-        ]
+    Sound => {
+        filetypes => [
+            qw( MOD 669 STM S3M MTM FAR ULT AMF DMF OKT ROL CMF MIDI SADT VOC WAV SMP8 SMP8S SMP16 SMP16S PATCH8 PATCH16 XM HSC IT )
+        ],
+        flags => { 0 => 'None' },
+        tinfo => [ ( {} ) x 16, ( { tinfo1 => 'Sampling Rate' } ) x 4 ]
     },
     BinaryText => {
         filetypes => [ qw( Undefined ) ],
         flags     => { 0 => 'None', 1 => 'iCE Color' }
     },
-    XBin       => {
+    XBin => {
         filetypes => [ qw( Undefined ) ],
         flags     => { 0 => 'None' },
-        tinfo     => [
-            { tinfo1 => 'Width', tinfo2 => 'Height' },
-        ]
+        tinfo     => [ { tinfo1 => 'Width', tinfo2 => 'Height' }, ]
     },
-    Archive    => {
+    Archive => {
         filetypes => [ qw( ZIP ARJ LZH ARC TAR ZOO RAR UC2 PAK SQZ ) ],
         flags     => { 0 => 'None' }
     },
@@ -257,11 +263,10 @@ sub new {
 
     $self->clear;
 
-    if(
-        exists $options{ file } or
-        exists $options{ string } or
-        exists $options{ handle }
-    ) {
+    if (   exists $options{ file }
+        or exists $options{ string }
+        or exists $options{ handle } )
+    {
         $self->read( @_ );
     }
     else {
@@ -283,8 +288,8 @@ sub clear {
     my $date = localtime;
 
     # Set empty/default SAUCE and COMMENT values
-    $self->set( $_ => '' ) for @sauce_fields[ 2..4 ];
-    $self->set( $_ => 0 ) for @sauce_fields[ 6..13, 14 ];
+    $self->set( $_ => '' ) for @sauce_fields[ 2 .. 4 ];
+    $self->set( $_ => 0 ) for @sauce_fields[ 6 .. 13, 14 ];
     $self->sauce_id( SAUCE_ID );
     $self->version( SAUCE_VERSION );
     $self->filler( SAUCE_FILLER );
@@ -310,7 +315,7 @@ sub read {
     my $buffer;
     my %info;
 
-    if( ( $file->stat )[ 7 ] < 128 ) {
+    if ( ( $file->stat )[ 7 ] < 128 ) {
         $self->has_sauce( 0 );
         return;
     }
@@ -318,7 +323,7 @@ sub read {
     $file->seek( -128, 2 );
     $file->read( $buffer, 128 );
 
-    if( substr( $buffer, 0, 5 ) ne SAUCE_ID ) {
+    if ( substr( $buffer, 0, 5 ) ne SAUCE_ID ) {
         $self->has_sauce( 0 );
         return;
     }
@@ -326,7 +331,7 @@ sub read {
     @info{ @sauce_fields } = unpack( $sauce_template, $buffer );
 
     # because trailing spaces are stripped....
-    $info{ filler } = SAUCE_FILLER; 
+    $info{ filler } = SAUCE_FILLER;
 
     # Do we have any comments?
     my $comments = $info{ comments };
@@ -335,13 +340,14 @@ sub read {
     $self->set( $_ => $info{ $_ } ) for keys %info;
     $self->has_sauce( 1 );
 
-    if( $comments > 0 ) {
+    if ( $comments > 0 ) {
         $file->seek( -128 - 5 - $comments * 64, 2 );
         $file->read( $buffer, 5 + $comments * 64 );
 
-        if( substr( $buffer, 0, 5 ) eq COMNT_ID ) {
-            my $template = $comnt_template . ( split( / /, $comnt_template ) )[ 1 ] x ( $comments - 1 );
-            my( $id, @comments ) = unpack( $template, $buffer );
+        if ( substr( $buffer, 0, 5 ) eq COMNT_ID ) {
+            my $template = $comnt_template
+                . ( split( / /, $comnt_template ) )[ 1 ] x ( $comments - 1 );
+            my ( $id, @comments ) = unpack( $template, $buffer );
             $self->comment_id( $id );
             $self->comments( \@comments );
         }
@@ -361,7 +367,7 @@ sub write {
     $self->remove( @_ );
 
     my %options = @_;
-    my $file    = $self->_create_io_object( \%options, '>>' );
+    my $file = $self->_create_io_object( \%options, '>>' );
 
     $file->seek( 0, 2 );
     $file->print( $self->as_string );
@@ -391,12 +397,12 @@ sub remove {
     my $has_sauce = $sauce->has_sauce;
     my %options   = @_;
 
-    unless( $has_sauce ) {
+    unless ( $has_sauce ) {
         return $options{ string } if exists $options{ string };
         return;
     }
 
-    my $file       = $self->_create_io_object( \%options, '>>' );
+    my $file = $self->_create_io_object( \%options, '>>' );
 
     # remove SAUCE
     my $sizeondisk = ( $file->stat )[ 7 ];
@@ -405,11 +411,12 @@ sub remove {
     my $saucesize  = 128 + ( $comments ? 5 + $comments * 64 : 0 );
     my $size       = $sizeondisk - $sizeinrec - $saucesize;
 
-    # for spoon compatibility
-    # Size on disk - size in record - SAUCE size (w/ comments) == 0 or 1 --> use size in record
-    if( $size =~ /^0|1$/ ) {
+# for spoon compatibility
+# Size on disk - size in record - SAUCE size (w/ comments) == 0 or 1 --> use size in record
+    if ( $size =~ /^0|1$/ ) {
         $file->truncate( $sizeinrec ) or carp "$!";
     }
+
     # figure it out on our own -- spoon just balks
     else {
         $file->truncate( $sizeondisk - $saucesize - 1 ) or carp "$!";
@@ -434,20 +441,28 @@ sub as_string {
     $self->comment_id( COMNT_ID );
 
     # EOF marker...
-    my $output   = chr( 26 );
+    my $output = chr( 26 );
 
     # comments...
     my $comments = scalar @{ $self->comments };
-    if( $comments ) {
-        $output .= pack( $comnt_template . ( ( split(/ /, $comnt_template ) )[ 1 ] x ( $comments - 1 )), $self->comment_id, @{ $self->comments } );
+    if ( $comments ) {
+        $output .= pack(
+            $comnt_template
+                . (
+                ( split( / /, $comnt_template ) )[ 1 ] x ( $comments - 1 )
+                ),
+            $self->comment_id,
+            @{ $self->comments }
+        );
     }
 
     # SAUCE...
     my @template = split( / /, $sauce_template );
-    for(0..$#sauce_fields) {
+    for ( 0 .. $#sauce_fields ) {
         my $field = $sauce_fields[ $_ ];
-        my $value = ( $field ne 'comments' ) ? $self->get( $field ) : $comments;
-        $output  .= pack( $template[ $_ ], $value );
+        my $value
+            = ( $field ne 'comments' ) ? $self->get( $field ) : $comments;
+        $output .= pack( $template[ $_ ], $value );
     }
 
     return $output;
@@ -466,37 +481,40 @@ sub print {
     my $has_sauce = $self->has_sauce;
     my $output;
 
-    if( $has_sauce == 0 ) {
+    if ( $has_sauce == 0 ) {
         print "The file last read did not contain a SAUCE record\n";
         return;
     }
 
-    for( @sauce_fields ) {
-        if( /^(datatype|filetype|flags)_id$/ ) {
-            $output   = sprintf( "$label %s", ucfirst( $1 ), $self->get( $_ ) );
+    for ( @sauce_fields ) {
+        if ( /^(datatype|filetype|flags)_id$/ ) {
+            $output = sprintf( "$label %s", ucfirst( $1 ), $self->get( $_ ) );
             my $value = $self->$1;
             print $output;
             print ' (' . $value . ')' if $value;
             print "\n";
         }
-        elsif( /^tinfo\d$/ ) {
-            $output   = sprintf( "$label %s", ucfirst( $_ ), $self->get( $_ ) );
+        elsif ( /^tinfo\d$/ ) {
+            $output = sprintf( "$label %s", ucfirst( $_ ), $self->get( $_ ) );
             my $name  = $_ . '_name';
             my $value = $self->$name;
             print $output;
             print ' (' . $value . ')' if $value;
             print "\n";
         }
-        elsif( $_ eq 'date' ) {
-            $output = sprintf( "$label %s\n", 'Date', $self->date->mdy( '/' ) );
+        elsif ( $_ eq 'date' ) {
+            $output
+                = sprintf( "$label %s\n", 'Date', $self->date->mdy( '/' ) );
             print $output;
         }
-        elsif( $_ eq 'comments' ) {
-            $output = sprintf( "$label %s\n", 'Comments', scalar @{ $self->comments } );
+        elsif ( $_ eq 'comments' ) {
+            $output = sprintf( "$label %s\n",
+                'Comments', scalar @{ $self->comments } );
             print $output;
         }
         else {
-            $output = sprintf( "$label %s\n", ucfirst( $_ ), $self->get( $_ ) );
+            $output
+                = sprintf( "$label %s\n", ucfirst( $_ ), $self->get( $_ ) );
             print $output;
         }
     }
@@ -505,13 +523,16 @@ sub print {
 
     return unless @comments;
 
-    $output  = sprintf( "$label %s\n", 'Comment_id', $self->comment_id );
+    $output = sprintf( "$label %s\n", 'Comment_id', $self->comment_id );
     $output .= sprintf( $label, 'Comments' );
 
     print $output;
 
-    for( 0..$#comments ) {
-        $output = sprintf( $_ == 0 ? " %s\n" : ( ' ' x ( $width + 1 ) ) . " %s\n", $comments[ $_ ] );
+    for ( 0 .. $#comments ) {
+        $output = sprintf(
+            $_ == 0 ? " %s\n" : ( ' ' x ( $width + 1 ) ) . " %s\n",
+            $comments[ $_ ]
+        );
         print $output;
     }
 }
@@ -523,6 +544,7 @@ Return the string version of the file's datatype. Use datatype_id to get the int
 =cut
 
 sub datatype {
+
     # Return the datatype name
     return $datatypes[ $_[ 0 ]->datatype_id ];
 }
@@ -534,8 +556,10 @@ Return the string version of the file's filetype. Use filetype_id to get the int
 =cut
 
 sub filetype {
+
     # Return the filetype name
-    return $filetypes->{ $_[ 0 ]->datatype }->{ filetypes }->[ $_[ 0 ]->filetype_id ];
+    return $filetypes->{ $_[ 0 ]->datatype }->{ filetypes }
+        ->[ $_[ 0 ]->filetype_id ];
 }
 
 =head2 flags( )
@@ -545,8 +569,10 @@ Return the string version of the file's flags. Use flags_id to get the integer v
 =cut
 
 sub flags {
+
     # Return an english description of the flags
-    return $filetypes->{ $_[ 0 ]->datatype }->{ flags }->{ $_[ 0 ]->flags_id };
+    return $filetypes->{ $_[ 0 ]->datatype }->{ flags }
+        ->{ $_[ 0 ]->flags_id };
 }
 
 =head2 tinfo1_name( )
@@ -556,8 +582,10 @@ Return an english description of what this info value represents (returns undef 
 =cut
 
 sub tinfo1_name {
+
     # Return an english description of info flag (1) or blank if there is none
-    return $filetypes->{ $_[ 0 ]->datatype }->{ tinfo }->[ $_[ 0 ]->filetype_id ]->{ tinfo1 };
+    return $filetypes->{ $_[ 0 ]->datatype }->{ tinfo }
+        ->[ $_[ 0 ]->filetype_id ]->{ tinfo1 };
 }
 
 =head2 tinfo2_name( )
@@ -567,8 +595,10 @@ Return an english description of what this info value represents (returns undef 
 =cut
 
 sub tinfo2_name {
+
     # Return an english description of info flag (2) or blank if there is none
-    return $filetypes->{ $_[ 0 ]->datatype }->{ tinfo }->[ $_[ 0 ]->filetype_id ]->{ tinfo2 };
+    return $filetypes->{ $_[ 0 ]->datatype }->{ tinfo }
+        ->[ $_[ 0 ]->filetype_id ]->{ tinfo2 };
 }
 
 =head2 tinfo3_name( )
@@ -578,8 +608,10 @@ Return an english description of what this info value represents (returns undef 
 =cut
 
 sub tinfo3_name {
+
     # Return an english description of info flag (3) or blank if there is none
-    return $filetypes->{ $_[ 0 ]->datatype }->{ tinfo }->[ $_[ 0 ]->filetype_id ]->{ tinfo3 };
+    return $filetypes->{ $_[ 0 ]->datatype }->{ tinfo }
+        ->[ $_[ 0 ]->filetype_id ]->{ tinfo3 };
 }
 
 =head2 tinfo4_name( )
@@ -589,8 +621,10 @@ Return an english description of what this info value represents (returns undef 
 =cut
 
 sub tinfo4_name {
+
     # Return an english description of info flag (4) or blank if there is none
-    return $filetypes->{ $_[ 0 ]->datatype }->{ tinfo }->[ $_[ 0 ]->filetype_id ]->{ tinfo4 };
+    return $filetypes->{ $_[ 0 ]->datatype }->{ tinfo }
+        ->[ $_[ 0 ]->filetype_id ]->{ tinfo4 };
 }
 
 =head2 date( [ $date ] )
@@ -605,8 +639,9 @@ sub date {
     my $self = shift;
     my $date = shift;
 
-    if( $date ) {
-        $self->set( 'date', $date->strftime( $date_format ) ) if ref( $date ) eq 'Time::Piece';
+    if ( $date ) {
+        $self->set( 'date', $date->strftime( $date_format ) )
+            if ref( $date ) eq 'Time::Piece';
         $self->set( 'date', $date ) if $date =~ /^\d{8}$/;
     }
 
@@ -629,17 +664,19 @@ sub _create_io_object {
     my $file;
 
     # use appropriate IO object for what we get in
-    if( exists $options{ file } ) {
+    if ( exists $options{ file } ) {
         $file = FileHandle->new( $options{ file }, $perms ) or croak "$!";
     }
-    elsif( exists $options{ string } ) {
+    elsif ( exists $options{ string } ) {
         $file = IO::String->new( $options{ string } );
     }
-    elsif( exists $options{ handle } ) {
+    elsif ( exists $options{ handle } ) {
         $file = $options{ handle };
     }
     else {
-        croak( "No valid read type. Must be one of 'file', 'string' or 'handle'." );
+        croak(
+            "No valid read type. Must be one of 'file', 'string' or 'handle'."
+        );
     }
 
     binmode $file;
@@ -652,7 +689,7 @@ Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007 by Brian Cassidy
+Copyright 2008 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

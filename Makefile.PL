@@ -1,5 +1,11 @@
 use inc::Module::Install 0.67;
 
+if ( -e 'MANIFEST.SKIP' ) {
+    system( 'pod2text lib/File/SAUCE.pm > README' );
+}
+
+perl_version '5.006';
+
 name 'File-SAUCE';
 all_from 'lib/File/SAUCE.pm';
 
@@ -8,7 +14,7 @@ requires 'IO::String' => '1.06';
 requires 'Time::Piece';
 requires 'Class::Accessor';
 
-requires 'Test::More';
+test_requires 'Test::More';
 
 auto_install;
 WriteAll;

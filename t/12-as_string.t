@@ -3,7 +3,7 @@ use Test::More tests => 9;
 use strict;
 use warnings;
 
-BEGIN { 
+BEGIN {
     use_ok( 'File::SAUCE' );
 }
 

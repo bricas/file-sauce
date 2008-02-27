@@ -13,7 +13,7 @@ my $testfile = qw( t/data/remove.dat );
 my $file     = qw( t/data/spoon.dat );
 my $filesize = 128;
 
-my $sauce    = File::SAUCE->new;
+my $sauce = File::SAUCE->new;
 isa_ok( $sauce, 'File::SAUCE' );
 
 create_test_file( $file );
@@ -25,11 +25,11 @@ is( $sauce->has_sauce, 1, 'Has Sauce' );
 $sauce->remove( file => $testfile );
 $sauce->read( file => $testfile );
 
-is( $sauce->has_sauce, 0, 'Has Sauce' );
-is( -s $testfile, $filesize, 'Filesize' );
+is( $sauce->has_sauce, 0,         'Has Sauce' );
+is( -s $testfile,      $filesize, 'Filesize' );
 
 create_test_file( $file );
-    
+
 # remove from handle
 open( FILE, "+<$testfile" );
 
@@ -39,13 +39,13 @@ is( $sauce->has_sauce, 1, 'Has Sauce' );
 $sauce->remove( handle => \*FILE );
 $sauce->read( handle => \*FILE );
 
-is( $sauce->has_sauce, 0, 'Has Sauce' );
-is( -s $testfile, $filesize, 'Filesize' );
+is( $sauce->has_sauce, 0,         'Has Sauce' );
+is( -s $testfile,      $filesize, 'Filesize' );
 
 close( FILE );
 
 create_test_file( $file );
-    
+
 # remove from string
 my $string = do {
     open( my $data, $testfile );
@@ -61,7 +61,7 @@ is( $sauce->has_sauce, 1, 'Has Sauce' );
 $string = $sauce->remove( string => $string );
 $sauce->read( string => $string );
 
-is( $sauce->has_sauce, 0, 'Has Sauce' );
+is( $sauce->has_sauce, 0,         'Has Sauce' );
 is( length( $string ), $filesize, 'Filesize' );
 
 # clean up

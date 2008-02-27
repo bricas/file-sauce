@@ -12,7 +12,7 @@ BEGIN {
 my $testfile = qw( t/data/remove.dat );
 my @files    = qw( t/data/bogus.dat t/data/bogus_long.dat );
 
-my $sauce    = File::SAUCE->new;
+my $sauce = File::SAUCE->new;
 isa_ok( $sauce, 'File::SAUCE' );
 
 for my $file ( @files ) {
@@ -27,11 +27,11 @@ for my $file ( @files ) {
     $sauce->remove( file => $testfile );
     $sauce->read( file => $testfile );
 
-    is( $sauce->has_sauce, 0, 'Has Sauce' );
-    is( -s $testfile, $filesize, 'Filesize' );
+    is( $sauce->has_sauce, 0,         'Has Sauce' );
+    is( -s $testfile,      $filesize, 'Filesize' );
 
     create_test_file( $file );
-    
+
     # remove from handle
     open( FILE, "+<$testfile" );
 
@@ -41,13 +41,13 @@ for my $file ( @files ) {
     $sauce->remove( handle => \*FILE );
     $sauce->read( handle => \*FILE );
 
-    is( $sauce->has_sauce, 0, 'Has Sauce' );
-    is( -s $testfile, $filesize, 'Filesize' );
+    is( $sauce->has_sauce, 0,         'Has Sauce' );
+    is( -s $testfile,      $filesize, 'Filesize' );
 
     close( FILE );
-    
+
     create_test_file( $file );
-    
+
     # remove from string
     my $string = do {
         open( my $data, $testfile );
@@ -63,7 +63,7 @@ for my $file ( @files ) {
     $string = $sauce->remove( string => $string );
     $sauce->read( string => $string );
 
-    is( $sauce->has_sauce, 0, 'Has Sauce' );
+    is( $sauce->has_sauce, 0,         'Has Sauce' );
     is( length( $string ), $filesize, 'Filesize' );
 
     # clean up

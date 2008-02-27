@@ -38,7 +38,7 @@ Comment_id: COMNT
             5 dollars = 100 lines - 10 dollars = 200 lines
 EOF
 
-check_output( $filename, $output);
+check_output( $filename, $output );
 
 $filename = 't/data/NA-SEVEN.CIA';
 $output   = <<'EOF';
@@ -60,9 +60,9 @@ $output   = <<'EOF';
     Filler:                       
 EOF
 
-check_output( $filename, $output);
+check_output( $filename, $output );
 
-$output   = <<'EOF';
+$output = <<'EOF';
   Sauce_id: SAUCE
    Version: 00
      Title: the seventh seal
@@ -91,7 +91,7 @@ EOF
 check_output( $filename, $output );
 
 sub check_output {
-    my( $filename, $output, $special ) = @_;
+    my ( $filename, $output, $special ) = @_;
 
     my $sauce = File::SAUCE->new( file => $filename );
     isa_ok( $sauce, 'File::SAUCE', 'SAUCE record' );
