@@ -152,7 +152,7 @@ use Time::Piece;
 
 use base qw( Class::Accessor );
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 # some SAUCE constants
 use constant SAUCE_ID      => 'SAUCE';

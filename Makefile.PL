@@ -1,4 +1,4 @@
-use inc::Module::Install 0.67;
+use inc::Module::Install 0.68;
 
 if ( -e 'MANIFEST.SKIP' ) {
     system( 'pod2text lib/File/SAUCE.pm > README' );

@@ -23,9 +23,9 @@ for ( 1 .. @files ) {
 
     # write to handle
     create_test_file();
-    open( FILE, ">>$testfile" );
-    $sauce->write( handle => \*FILE );
-    close( FILE );
+    open( my $fh, ">>$testfile" );
+    $sauce->write( handle => $fh );
+    close( $fh );
     $test->( File::SAUCE->new( file => $testfile ) );
 
     # write to string

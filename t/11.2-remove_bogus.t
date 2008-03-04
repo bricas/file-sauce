@@ -33,18 +33,18 @@ for my $file ( @files ) {
     create_test_file( $file );
 
     # remove from handle
-    open( FILE, "+<$testfile" );
+    open( my $fh, "+<$testfile" );
 
-    $sauce->read( handle => \*FILE );
+    $sauce->read( handle => $fh );
     is( $sauce->has_sauce, 0, 'Has Sauce' );
 
-    $sauce->remove( handle => \*FILE );
-    $sauce->read( handle => \*FILE );
+    $sauce->remove( handle => $fh );
+    $sauce->read( handle => $fh );
 
     is( $sauce->has_sauce, 0,         'Has Sauce' );
     is( -s $testfile,      $filesize, 'Filesize' );
 
-    close( FILE );
+    close( $fh );
 
     create_test_file( $file );
 

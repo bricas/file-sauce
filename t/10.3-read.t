@@ -21,10 +21,10 @@ for ( 1 .. @files ) {
     $test->( $sauce );
 
     # read from handle
-    open( FILE, $file );
-    $sauce->read( handle => \*FILE );
+    open( my $fh, $file );
+    $sauce->read( handle => $fh );
     $test->( $sauce );
-    close( FILE );
+    close( $fh );
 
     # read from string
     my $string = do {

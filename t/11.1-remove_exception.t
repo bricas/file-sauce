@@ -1,26 +1,27 @@
-use Test::More;
+use Test::More tests => 4;
 
 use strict;
 use warnings;
 
-BEGIN {
-    eval "use Test::Warn";
-    plan skip_all => "Test::Warn required" if $@;
-    plan tests => 4;
-
-    use_ok( 'File::SAUCE' );
-}
+use_ok( 'File::SAUCE' );
 
 my $sauce = File::SAUCE->new;
 isa_ok( $sauce, 'File::SAUCE' );
 
-open( FILE, 't/data/NA-SEVEN.CIA' );
-warning_like { $sauce->remove( handle => \*FILE ); }{ carped => qr/at/ },
-    'Remove (fail - read only [CASE 1])';
-close( FILE );
+{
+    my $warnings = 0;
+    local $SIG{ __WARN__ } = sub { $warnings++ };
+    open( my $file, 't/data/NA-SEVEN.CIA' );
+    $sauce->remove( handle => $file );
+    ok( $warnings, 'Remove (fail - read only [CASE 1])' );
+    close( $file );
+}
 
-open( FILE, 't/data/spoon.dat' );
-warning_like { $sauce->remove( handle => \*FILE ); }{ carped => qr/at/ },
-    'Remove (fail - read only [CASE 2])';
-close( FILE );
-
+{
+    my $warnings = 0;
+    local $SIG{ __WARN__ } = sub { $warnings++ };
+    open( my $file, 't/data/spoon.dat' );
+    $sauce->remove( handle => $file );
+    ok( $warnings, 'Remove (fail - read only [CASE 2])' );
+    close( $file );
+}

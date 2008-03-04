@@ -18,10 +18,10 @@ for my $file ( @files ) {
     is( $sauce->has_sauce, 0, 'Has Sauce' );
 
     # read from handle
-    open( FILE, $file );
-    $sauce->read( handle => \*FILE );
+    open( my $fh, $file );
+    $sauce->read( handle => $fh );
     is( $sauce->has_sauce, 0, 'Has Sauce' );
-    close( FILE );
+    close( $fh );
 
     # read from string
     my $string = do {
