@@ -1,5 +1,8 @@
 Revision history for Perl extension File::SAUCE.
 
+0.25  Thu Nov 19 2009
+    - repackaged with a new version of Module::Install
+
 0.24  Tue Mar 04 2008
     - test suite work
 
